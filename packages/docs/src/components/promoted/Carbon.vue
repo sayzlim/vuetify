@@ -21,9 +21,9 @@
         />
 
         <promoted-script
-          v-if="error1"
+          v-if="missing"
           id="bsa-zone_1691166982595-9_123456"
-          :src="`https://cdn4.buysellads.net/pub/vuetifyjs.js?${Date.now() % 600000}`"
+          :src="`//cdn4.buysellads.net/pub/vuetifyjs.js?${timestamp}`"
           script-id="bsa-optimize"
           @script:error="error2 = true"
         />
@@ -50,8 +50,11 @@
 
   const error1 = shallowRef(false)
   const error2 = shallowRef(false)
+  const missing = shallowRef(false)
   const script = shallowRef(null)
   let timer = -1 as any
+
+  const timestamp = Date.now() % 600000;
 
   function checkForElement (id: string, cb?: () => void) {
     return setTimeout(() => {
@@ -60,12 +63,13 @@
       clearTimeout(timer)
 
       cb?.()
-    }, 2000)
+    }, 4000)
   }
 
-  watch(error1, val => {
+  watch(missing, val => {
     if (!val) return
 
+    document.getElementById('carbonads-script').remove();
     timer = checkForElement('bsa-zone_1691166982595-9_123456', () => {
       error2.value = true
     })
@@ -73,7 +77,7 @@
 
   onMounted(() => {
     timer = checkForElement('carbonads', () => {
-      error1.value = true
+      missing.value = true
     })
   })
 
@@ -89,6 +93,7 @@
   const theme = useTheme()
 
   const isDark = computed(() => theme.current.value.dark)
+
 </script>
 
 <style lang="sass">
